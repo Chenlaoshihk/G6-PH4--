@@ -1,0 +1,37 @@
+========================================
+G6 中文練習網站・GitHub Pages 部署說明
+========================================
+
+【檔案結構】（必須保持這樣，不要改資料夾名）
+  index.html              主站：《童年》詞語練習網站（含老師後台）
+  chengyu/index.html      成語練習網站
+  部署說明.txt            本說明（可刪）
+
+【上傳到 GitHub】
+1. 登入 github.com → 右上「+」→ New repository
+2. Repository name 填：g6-chinese（可自訂）
+   選 Public → Create repository
+3. 進入 repo → 「Add file」→「Upload files」
+4. 把本資料夾的 index.html 及 chengyu 資料夾一起拖進去
+   （拖整個「GitHub部署包」資料夾內容，不要拖外層資料夾本身）
+5. 下方按「Commit changes」
+
+【開啟 GitHub Pages】
+6. repo 上方「Settings」→ 左側「Pages」
+7. Source 選「Deploy from a branch」
+   Branch 選「main」，資料夾選「/ (root)」→ Save
+8. 等 1–2 分鐘，重新整理該頁，上方會出現網址：
+   https://你的帳號.github.io/g6-chinese/
+
+【網址對應】
+  詞語站：https://你的帳號.github.io/g6-chinese/
+  成語站：https://你的帳號.github.io/g6-chinese/chengyu/
+
+【更新內容】
+  重新上傳同名檔案並 Commit 即可，網址不變。
+
+【注意】
+- 老師後台密碼：teacher（在 index.html 內搜尋 pwd.trim()!=="teacher" 可改）
+- 學生成績存在作答裝置的瀏覽器（localStorage），換裝置看不到，
+  建議每堂下課在後台按「匯出 CSV」存檔。
+- repo 必須是 Public，Private repo 的 Pages 需要付費方案。

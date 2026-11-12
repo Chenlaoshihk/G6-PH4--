@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>詞語練習網站｜第一關《童年》</title>
+<style>
+:root{
+  --bg:#f0f6ff; --card:#ffffff; --ink:#222; --muted:#6b7a90;
+  --blue:#2b6cb0; --blue-soft:#e3effb;
+  --green:#2f9e44; --green-soft:#e6f6ea;
+  --yellow:#c99700; --yellow-soft:#fdf6df;
+  --red:#d64545; --red-soft:#fdeaea;
+  --ok:#2f9e44; --bad:#d64545;
+  --radius:16px; --shadow:0 4px 14px rgba(43,108,176,.12);
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif;
+  line-height:1.7;}
+header{background:linear-gradient(135deg,#2b6cb0,#4c8fd6);color:#fff;
+  padding:22px 16px 24px;text-align:center;position:relative;}
+header h1{margin:0;font-size:1.6em;letter-spacing:2px;}
+header p{margin:6px 0 0;opacity:.92;font-size:.92em;}
+.hdr-user{position:absolute;right:12px;top:12px;font-size:.85em;background:rgba(255,255,255,.2);
+  border-radius:99px;padding:3px 12px;}
+.switch-btn{position:absolute;left:12px;top:12px;border:none;border-radius:99px;padding:4px 12px;
+  font-size:.8em;font-family:inherit;cursor:pointer;background:rgba(255,255,255,.22);color:#fff;}
+.switch-btn:hover{background:rgba(255,255,255,.36);}
+.tl{display:inline-block;width:13px;height:13px;border-radius:50%;margin:0 2px;vertical-align:-1px;}
+main{max-width:860px;margin:0 auto;padding:18px 14px 60px;}
+.home-hero{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:16px 20px;margin-bottom:18px;font-size:.95em;}
+.group-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+  margin-bottom:20px;overflow:hidden;}
+.group-head{padding:14px 20px;color:#fff;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;}
+.group-head h2{margin:0;font-size:1.15em;}
+.group-head .tag{font-size:.85em;background:rgba(255,255,255,.25);border-radius:99px;padding:2px 12px;}
+.group-body{padding:14px 18px 18px;}
+.wordcloud{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px;}
+.wchip{border-radius:10px;padding:3px 11px;font-weight:bold;font-size:1em;}
+.levels{display:flex;flex-direction:column;gap:10px;}
+.level-btn{display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+  border:2px solid;border-radius:12px;padding:10px 14px;background:#fff;
+  font-size:1em;cursor:pointer;transition:.15s;font-family:inherit;}
+.level-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
+.lv-dot{width:34px;height:34px;border-radius:50%;flex:0 0 34px;display:flex;align-items:center;justify-content:center;font-size:1.1em;color:#fff;}
+.lv-name{font-weight:bold;font-size:1.03em;}
+.lv-desc{font-size:.85em;color:var(--muted);}
+.lv-score{margin-left:auto;font-size:.85em;color:var(--muted);white-space:nowrap;}
+.quiz-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.back-btn{border:none;background:var(--blue-soft);color:var(--blue);border-radius:10px;
+  padding:6px 14px;cursor:pointer;font-family:inherit;font-weight:bold;}
+.qbar{flex:1;height:10px;background:#e4edf7;border-radius:99px;overflow:hidden;min-width:120px;}
+.qbar i{display:block;height:100%;background:var(--blue);border-radius:99px;transition:width .3s;}
+.qcount{font-size:.9em;color:var(--muted);}
+.qcard{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 20px;}
+.qbadge{display:inline-block;font-size:.82em;font-weight:bold;color:#fff;border-radius:99px;padding:3px 14px;margin-bottom:10px;}
+.qtext{font-size:1.22em;font-weight:bold;margin:6px 0 16px;}
+.options{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;}
+.opt{border:2px solid #c9d9ec;background:#fff;border-radius:12px;padding:13px 10px;
+  font-size:1.05em;cursor:pointer;transition:.12s;font-family:inherit;}
+.opt:hover:not(:disabled){border-color:var(--blue);background:var(--blue-soft);}
+.opt.correct{border-color:var(--ok);background:var(--green-soft);color:var(--ok);font-weight:bold;}
+.opt.wrong{border-color:var(--bad);background:var(--red-soft);color:var(--bad);font-weight:bold;}
+.opt:disabled{cursor:default;}
+.blank-in{display:inline-block;min-width:110px;border-bottom:2px solid var(--blue);
+  text-align:center;font-weight:bold;color:var(--blue);}
+.speak-btn{border:2px solid var(--blue);background:var(--blue-soft);color:var(--blue);
+  border-radius:99px;padding:10px 22px;font-size:1.05em;cursor:pointer;font-family:inherit;margin:4px 0 12px;}
+.speak-btn:active{transform:scale(.97);}
+.fb{margin-top:14px;border-radius:12px;padding:11px 14px;font-weight:bold;display:none;}
+.fb.ok{display:block;background:var(--green-soft);color:var(--ok);}
+.fb.bad{display:block;background:var(--red-soft);color:var(--bad);}
+.fb .why{font-weight:normal;font-size:.93em;display:block;margin-top:4px;color:var(--ink);}
+.countdown{font-size:.85em;color:var(--muted);margin-top:6px;font-weight:normal;}
+.btn{border:none;background:var(--blue);color:#fff;border-radius:12px;
+  padding:10px 26px;font-size:1em;cursor:pointer;font-family:inherit;}
+.btn.ghost{background:var(--blue-soft);color:var(--blue);}
+.btn.green{background:var(--green);}
+.done-box{text-align:center;padding:26px 14px;}
+.done-box .big{font-size:3em;}
+.done-box h3{margin:8px 0;}
+.stars{font-size:1.6em;letter-spacing:4px;}
+.hidden{display:none;}
+footer{text-align:center;color:var(--muted);font-size:.82em;padding:10px 0 30px;}
+
+/* 登入 / 老師後台 */
+.gate{max-width:460px;margin:40px auto;background:#fff;border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:28px 24px;text-align:center;}
+.gate h2{margin:0 0 6px;color:var(--blue);}
+.gate p{color:var(--muted);font-size:.92em;margin:0 0 18px;}
+.gate input{width:100%;border:2px solid #c9d9ec;border-radius:12px;padding:12px 14px;
+  font-size:1.1em;font-family:inherit;text-align:center;}
+.gate input:focus{outline:none;border-color:var(--blue);}
+.gate select{width:100%;border:2px solid #c9d9ec;border-radius:12px;padding:12px 14px;
+  font-size:1em;font-family:inherit;margin-top:10px;background:#fff;}
+.gate .btn{width:100%;margin-top:14px;padding:13px;font-size:1.08em;}
+
+table{width:100%;border-collapse:collapse;font-size:.92em;}
+th,td{border-bottom:1px solid #dfe9f4;padding:8px 6px;text-align:left;}
+th{background:var(--blue-soft);color:var(--blue);font-size:.88em;white-space:nowrap;}
+td.num{text-align:center;font-weight:bold;}
+.pill{display:inline-block;border-radius:99px;padding:1px 9px;font-size:.82em;font-weight:bold;}
+.pill.p{background:var(--green-soft);color:var(--ok);}
+.pill.f{background:var(--red-soft);color:var(--bad);}
+.pill.n{background:#eef2f7;color:var(--muted);}
+.tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.tabs button{border:2px solid #c9d9ec;background:#fff;border-radius:99px;padding:6px 16px;
+  cursor:pointer;font-family:inherit;font-size:.92em;}
+.tabs button.on{background:var(--blue);color:#fff;border-color:var(--blue);}
+.teacher-wrap{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;}
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px;}
+.sum-card{background:var(--blue-soft);border-radius:12px;padding:12px;text-align:center;}
+.sum-card b{display:block;font-size:1.5em;color:var(--blue);}
+.sum-card span{font-size:.82em;color:var(--muted);}
+@media (max-width:480px){ .qtext{font-size:1.08em;} th,td{font-size:.85em;padding:6px 3px;} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-user" id="hdrUser"></div>
+  <button id="switchBtn" class="switch-btn hidden" onclick="switchStudent()">🚪 切換學生</button>
+  <h1>🎨 詞語練習網站</h1>
+  <p>G6 Phase 4 第二單元〈童年時光〉・課文一《羅大佑談〈童年〉》・第一關</p>
+  <div style="font-size:.9em;margin-top:4px">
+    <span class="tl" style="background:#2f9e44"></span>綠燈・基礎
+    <span class="tl" style="background:#f0c419"></span>黃燈・進階
+    <span class="tl" style="background:#e05252"></span>紅燈・挑戰
+  </div>
+</header>
+
+<!-- ============ 登入閘門 ============ -->
+<div id="gate" class="gate">
+  <h2>👋 請先輸入姓名</h2>
+  <p>輸入後才能開始練習。成績會自動記錄在這台電腦／平板，老師可在後台查看。</p>
+  <input id="nameInput" maxlength="12" placeholder="請輸入你的姓名" autocomplete="off">
+  <select id="classSel">
+    <option value="6A">6A</option>
+    <option value="6B">6B</option>
+    <option value="6C">6C</option>
+    <option value="6D">6D</option>
+    <option value="6E">6E</option>
+    <option value="6F">6F</option>
+  </select>
+  <button class="btn" onclick="doLogin()">開始練習 →</button>
+  <button class="btn ghost" style="margin-top:10px" onclick="openTeacher()">👩‍🏫 我是老師</button>
+</div>
+
+<main id="app" class="hidden">
+  <div class="home-hero">
+    <b>🏠 第一關・詞語溫習</b><br>
+    三個部分：<b>溫故詞語</b> → <b>紅色詞語（認寫字）</b> → <b>藍色詞語（認讀字）</b>。<br>
+    每部分有三個分層關卡：<span style="color:var(--green);font-weight:bold">🟢 綠燈</span>聽詞語選詞語、
+    <span style="color:var(--yellow);font-weight:bold">🟡 黃燈</span>解釋與詞語互相選擇、
+    <span style="color:var(--red);font-weight:bold">🔴 紅燈</span>選詞填空。<br>
+    <span style="color:var(--muted);font-size:.9em">答題後會自動跳到下一題；每關 10 題，答對 8 題以上通關。</span>
+  </div>
+  <div id="groups"></div>
+</main>
+
+<div id="quiz" class="hidden" style="max-width:860px;margin:0 auto;padding:10px 14px 60px;">
+  <div class="quiz-top">
+    <button class="back-btn" onclick="exitQuiz()">← 返回</button>
+    <div class="qbar"><i id="barFill"></i></div>
+    <span class="qcount" id="qCount"></span>
+  </div>
+  <div class="qcard">
+    <span class="qbadge" id="qBadge"></span>
+    <div id="qBody"></div>
+    <div class="fb" id="fb"></div>
+  </div>
+</div>
+
+<!-- ============ 老師後台 ============ -->
+<div id="teacher" class="hidden" style="max-width:1000px;margin:0 auto;padding:18px 14px 60px;">
+  <div class="teacher-wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+      <h2 style="margin:0;font-size:1.2em;color:var(--blue)">👩‍🏫 老師後台・學生成績</h2>
+      <div>
+        <button class="btn ghost" onclick="exportCSV()">⬇ 匯出 CSV</button>
+        <button class="btn ghost" onclick="clearAll()">🗑 清空記錄</button>
+        <button class="btn ghost" onclick="closeTeacher()">返回</button>
+      </div>
+    </div>
+    <div class="summary-grid" id="sumGrid"></div>
+    <div class="tabs" id="tabs"></div>
+    <div style="overflow-x:auto" id="tableWrap"></div>
+    <p style="font-size:.85em;color:var(--muted);margin-top:12px">
+      📍 <b>成績存在哪裡？</b>存在這台電腦的瀏覽器資料庫（localStorage，鍵名 <code>childhood_words_v1</code>），
+      不會上傳網絡。所以只有「用同一台電腦」的成績才會出現在這裡。<br>
+      ✅ 每關答對 8 題以上為通關。<br>
+      ⚠️ 清除瀏覽器資料／改用無痕模式／換另一台電腦，都會看不到之前的記錄 — 建議每次下課按「⬇ 匯出 CSV」存檔。
+    </p>
+  </div>
+</div>
+
+<footer>G6 Phase 4 〈童年時光〉・課文一詞語練習・第一關<br>
+<a href="chengyu/index.html" style="color:#2b6cb0">🔗 前往「成語練習網站」</a></footer>
+
+<script>
+/* ================= 詞語資料 ================= */
+const GROUPS = [
+{
+  id:"review", name:"溫故詞語", color:"#6a7fa8", desc:"舊單元學過的詞語",
+  words:[
+    {w:"童年", p:"tóng nián", def:"小時候；兒童時期"},
+    {w:"記憶", p:"jì yì", def:"過往經歷留在腦海裡的事情"},
+    {w:"歌詞", p:"gē cí", def:"歌曲裡的文字"},
+    {w:"選擇", p:"xuǎn zé", def:"挑選、決定用哪一個"},
+    {w:"其實", p:"qí shí", def:"實際上、說實話"},
+    {w:"內心", p:"nèi xīn", def:"心裡、心裡面"},
+    {w:"玩耍", p:"wán shuǎ", def:"做遊戲、嬉戲"},
+    {w:"回憶", p:"huí yì", def:"留在心中的往事"},
+    {w:"印象", p:"yìn xiàng", def:"看過、經歷後留在腦海裡的感覺"},
+    {w:"分享", p:"fēn xiǎng", def:"把自己的感受、東西分給別人"},
+    {w:"無論", p:"wú lùn", def:"不論、不管"},
+    {w:"永遠", p:"yǒng yuǎn", def:"一直、長久不變"}
+  ],
+  fills:[
+    {s:["羅大佑的《童年》，唱出了很多人美好的 "], ans:"童年"},
+    {s:["這首歌是幾代人共同的 "], ans:"記憶"},
+    {s:["您的《童年》這首 ","，陪伴很多人長大。"], ans:"歌詞"},
+    {s:["他當初為什麼會 ","「童年」作為創作的主題？"], ans:"選擇"},
+    {s:["這首歌 ","是寫給大人的。"], ans:"其實"},
+    {s:["他希望大人靜下心來，聽一聽自己 ","的聲音。"], ans:"內心"},
+    {s:["他在台灣淡水看到海邊 ","的孩子。"], ans:"玩耍"},
+    {s:["這首歌的靈感，來自他小時候的 ","。"], ans:"回憶"},
+    {s:["這首歌給大家留下很深的 ","。"], ans:"印象"},
+    {s:["羅大佑想和大家 ","童年的快樂。"], ans:"分享"},
+    {s:["","過了多少年，大家都會記得這首歌。"], ans:"無論"},
+    {s:["這份珍貴的回憶，我會 ","記在心裡。"], ans:"永遠"}
+  ]
+},
+{
+  id:"red", name:"紅色詞語（認寫字）", color:"#d64545", desc:"本課要求會讀會寫的詞語",
+  words:[
+    {w:"採訪", p:"cǎi fǎng", def:"記者訪問別人、記錄談話"},
+    {w:"受訪人", p:"shòu fǎng rén", def:"接受訪問的人"},
+    {w:"採訪人", p:"cǎi fǎng rén", def:"提出問題、進行訪問的人"},
+    {w:"雜誌", p:"zá zhì", def:"定期出版、內容豐富的刊物"},
+    {w:"好奇", p:"hào qí", def:"對事物感到新鮮，很想知道"},
+    {w:"創作", p:"chuàng zuò", def:"寫作、產生作品"},
+    {w:"主題", p:"zhǔ tí", def:"作品主要談的內容"},
+    {w:"最初", p:"zuì chū", def:"最開始、最早"},
+    {w:"來源", p:"lái yuán", def:"事物來自的地方"},
+    {w:"純真", p:"chún zhēn", def:"天真、沒有雜念"},
+    {w:"畫面", p:"huà miàn", def:"畫中呈現的情景"},
+    {w:"觀察", p:"guān chá", def:"仔細看、留意"},
+    {w:"嚮往", p:"xiàng wǎng", def:"心裡非常盼望、渴望"},
+    {w:"意義", p:"yì yì", def:"價值、含意；重要性"},
+    {w:"連結", p:"lián jié", def:"把兩樣東西接在一起，使相通"},
+    {w:"珍貴", p:"zhēn guì", def:"價值高、很寶貴"}
+  ],
+  fills:[
+    {s:["記者今天 ","(cǎi fǎng)了羅大佑老師。"], ans:"採訪"},
+    {s:["這次訪問刊登在《人物》","(zá zhì)上。"], ans:"雜誌"},
+    {s:["很多人 ","(hào qí)，他為什麼會寫這首歌。"], ans:"好奇"},
+    {s:["他喜歡以「童年」作為 ","(chuàng zuò)的主題。"], ans:"創作"},
+    {s:["「童年」就是這首歌的 ","(zhǔ tí)。"], ans:"主題"},
+    {s:["他希望大人找回那份 ","(zuì chū)的自己。"], ans:"最初"},
+    {s:["這首歌的 ","(lái yuán)，是他小時候的回憶。"], ans:"來源"},
+    {s:["孩子們那種 ","(chún zhēn)的快樂，讓他想起自己的童年。"], ans:"純真"},
+    {s:["歌詞裡的 ","(huà miàn)，就來自於他的回憶和觀察。"], ans:"畫面"},
+    {s:["歌詞裡的畫面，來自他的回憶和 ","(guān chá)。"], ans:"觀察"},
+    {s:["他很 ","(xiàng wǎng)放學後自由玩耍的時光。"], ans:"嚮往"},
+    {s:["這位 ","(cǎi fǎng rén)向羅大佑提出了很多問題。"], ans:"採訪人"},
+    {s:["接受訪問的人，叫做 ","(shòu fǎng rén)。"], ans:"受訪人"},
+    {s:["這首歌像一座橋，","(lián jié)著童年和現在。"], ans:"連結"},
+    {s:["這份 ","(zhēn guì)的回憶，值得好好收藏。"], ans:"珍貴"},
+    {s:["這首歌對他有特別的 ","(yì yì)。"], ans:"意義"}
+  ]
+},
+{
+  id:"blue", name:"藍色詞語（認讀字）", color:"#2b6cb0", desc:"本課要求認讀的詞語",
+  words:[
+    {w:"標題", p:"biāo tí", def:"文章或作品的名字"},
+    {w:"實錄", p:"shí lù", def:"真實的記錄"},
+    {w:"集體", p:"jí tǐ", def:"大家共同組成的整體"},
+    {w:"掙扎", p:"zhēng zhá", def:"用力反抗、苦苦支撐"},
+    {w:"偶爾", p:"ǒu ěr", def:"偶然、有時候"},
+    {w:"迷茫", p:"mí máng", def:"模糊不清，不知道該怎樣做"},
+    {w:"靈感", p:"líng gǎn", def:"突然出現的創作念頭"},
+    {w:"池塘", p:"chí táng", def:"儲水的坑，一般不太大，有魚"},
+    {w:"心得", p:"xīn dé", def:"學習或做事後體會到的收穫"},
+    {w:"忙碌", p:"máng lù", def:"事情很多，不得空閒"},
+    {w:"無憂無慮", p:"wú yōu wú lǜ", def:"沒有憂慮，心情舒暢"},
+    {w:"自由自在", p:"zì yóu zì zài", def:"不受拘束，想做就做"},
+    {w:"天真爛漫", p:"tiān zhēn làn màn", def:"心思單純，自然率真"},
+    {w:"良辰美景", p:"liáng chén měi jǐng", def:"美好的時光和景色"}
+  ],
+  fills:[
+    {s:["您的《童年》可以說是幾代人的 ","(jí tǐ)記憶。"], ans:"集體"},
+    {s:["這首歌，能讓正在為生活 ","(zhēng zhá)的我們靜下心來。"], ans:"掙扎"},
+    {s:["有些人 ","(ǒu ěr)會想起小時候一起玩耍的朋友。"], ans:"偶爾"},
+    {s:["前路看不清，他心裡感到有點 ","(mí máng)。"], ans:"迷茫"},
+    {s:["他在海邊看到玩耍的孩子，得到了寫歌的 ","(líng gǎn)。"], ans:"靈感"},
+    {s:["歌詞裡寫到，門前的 ","(chí táng)邊有一棵大榕樹。"], ans:"池塘"},
+    {s:["聽完這次訪問，同學們寫下了自己的 ","(xīn dé)。"], ans:"心得"},
+    {s:["希望大家在 ","(máng lù)的生活中，也不要忘記心裡那個愛玩的小孩。"], ans:"忙碌"},
+    {s:["羅大佑的童年沒那麼 ","(wú yōu wú lǜ)，他六歲就開始學鋼琴。"], ans:"無憂無慮"},
+    {s:["放學後 ","(zì yóu zì zài)地玩耍，是孩子們最快樂的時光。"], ans:"自由自在"},
+    {s:["歌詞裡 ","(tiān zhēn làn màn)的童年畫面，喚起了大人心中最純真的回憶。"], ans:"天真爛漫"},
+    {s:["星期天和家人一起到海邊賞景，真是 ","(liáng chén měi jǐng)。"], ans:"良辰美景"},
+    {s:["這篇課文的 ","(biāo tí)是〈寫給大人的童年回憶〉。"], ans:"標題"},
+    {s:["這是一次採訪 ","(shí lù)，真實地記錄了每一句話。"], ans:"實錄"}
+  ]
+}];
+
+const LV = [
+  {id:"green", name:"🟢 綠燈・聽詞語選詞語", desc:"聽發音，選出正確的詞語", css:"var(--green)", type:"listen"},
+  {id:"yellow", name:"🟡 黃燈・解釋與詞語互相選擇", desc:"看解釋選詞語，看詞語選解釋", css:"var(--yellow)", type:"match"},
+  {id:"red", name:"🔴 紅燈・選詞填空", desc:"把正確的詞語填進句子裡", css:"var(--red)", type:"fill"}
+];
+
+/* ================= 狀態 ================= */
+const STORE_KEY = "childhood_words_v1";
+let student = null;          // {name, cls}
+let score = {};              // "gid-lid" -> {right,total,ts}
+let session = null;
+let autoTimer = null;
+let lastAnswerAt = 0;
+
+function key(g,l){ return g+"-"+l; }
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+/* ================= 儲存 ================= */
+function loadAll(){
+  try{ return JSON.parse(localStorage.getItem(STORE_KEY)) || {records:[]}; }
+  catch(e){ return {records:[]}; }
+}
+function saveAll(db){ localStorage.setItem(STORE_KEY, JSON.stringify(db)); }
+function saveResult(gid, lid, right, total){
+  const db = loadAll();
+  const rec = {name:student.name, cls:student.cls, gid, lid,
+               right, total, pass: right>=8, ts:Date.now()};
+  db.records.push(rec);
+  saveAll(db);
+}
+
+/* ================= 登入 ================= */
+function doLogin(){
+  const n = document.getElementById("nameInput").value.trim();
+  if(!n){ alert("請先輸入你的姓名！"); return; }
+  student = {name:n, cls:document.getElementById("classSel").value};
+  localStorage.setItem("childhood_words_current", JSON.stringify(student));
+  enterApp();
+}
+function enterApp(){
+  document.getElementById("gate").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+  document.getElementById("hdrUser").textContent = "👤 "+student.name+"（"+student.cls+"）";
+  document.getElementById("switchBtn").classList.remove("hidden");
+  renderHome();
+}
+
+/* ================= 首頁 ================= */
+function groupDone(gid){
+  return LV.every(l => score[key(gid,l.id)] && score[key(gid,l.id)].total>=10 && score[key(gid,l.id)].right>=8);
+}
+function renderHome(){
+  const el = document.getElementById("groups");
+  el.innerHTML = GROUPS.map(g=>{
+    const chips = g.words.map(w=>`<span class="wchip" style="background:${g.color}18;color:${g.color};border:1.5px solid ${g.color}55">${w.w}</span>`).join("");
+    const levels = LV.map(l=>{
+      const s = score[key(g.id,l.id)];
+      const done = s && s.total>=10;
+      const pass = s && s.right>=8;
+      const star = done ? (pass? (s.right===s.total?"🏆":"⭐") : "🔁") : "▶";
+      return `<button class="level-btn" style="border-color:${l.css}" onclick="startQuiz('${g.id}','${l.id}')">
+        <span class="lv-dot" style="background:${l.css}">${done?(pass?"✓":"!"):"▶"}</span>
+        <span><span class="lv-name">${l.name}</span><br><span class="lv-desc">${l.desc}</span></span>
+        <span class="lv-score">${done? star+" "+s.right+"/"+s.total : "未挑戰"}</span>
+      </button>`;
+    }).join("");
+    const badge = groupDone(g.id) ? `<span class="tag">🎉 已通關</span>` : `<span class="tag">${g.words.length} 個詞語</span>`;
+    return `<div class="group-card">
+      <div class="group-head" style="background:${g.color}">
+        <h2>${g.id==="review"?"📚":(g.id==="red"?"🔴":"🔵")} ${g.name}</h2>${badge}
+      </div>
+      <div class="group-body">
+        <div style="font-size:.88em;color:var(--muted)">${g.desc}　（先認一認下面的詞語）</div>
+        <div class="wordcloud">${chips}</div>
+        <div class="levels">${levels}</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+/* ================= 出題 ================= */
+function buildQuestions(gid, lvType){
+  const g = GROUPS.find(x=>x.id===gid);
+  const qs = [];
+  const wrongFrom = (t, n) => shuffle(g.words.filter(w=>w.w!==t.w)).slice(0,n);
+  if(lvType==="listen"){
+    shuffle(g.words).slice(0,10).forEach(t=>{
+      qs.push({kind:"listen", target:t, options:shuffle([t, ...wrongFrom(t,3)])});
+    });
+  } else if(lvType==="match"){
+    shuffle(g.words).slice(0,10).forEach((t,i)=>{
+      if(i%2===0){
+        qs.push({kind:"def2word", target:t, options:shuffle([t, ...wrongFrom(t,3)])});
+      } else {
+        qs.push({kind:"word2def", target:t, options:shuffle([t.def, ...wrongFrom(t,3).map(w=>w.def)])});
+      }
+    });
+  } else {
+    shuffle(g.fills).slice(0,10).forEach(f=>{
+      const others = wrongFrom({w:f.ans},3).map(w=>w.w);
+      qs.push({kind:"fill", fill:f, options:shuffle([f.ans, ...others])});
+    });
+  }
+  return qs;
+}
+
+function startQuiz(gid, lvId){
+  const g = GROUPS.find(x=>x.id===gid);
+  const l = LV.find(x=>x.id===lvId);
+  session = {gid, lvId, g, l, qs:buildQuestions(gid, l.type), idx:0, right:0, results:[]};
+  document.getElementById("app").classList.add("hidden");
+  document.getElementById("quiz").classList.remove("hidden");
+  const badge = document.getElementById("qBadge");
+  badge.textContent = g.name+"・"+l.name;
+  badge.style.background = l.css;
+  showQ();
+}
+
+function showQ(){
+  clearTimeout(autoTimer);
+  const {qs, idx} = session;
+  const q = qs[idx];
+  document.getElementById("barFill").style.width = (idx/qs.length*100)+"%";
+  document.getElementById("qCount").textContent = `第 ${idx+1} / ${qs.length} 題・已對 ${session.right} 題`;
+  const fb = document.getElementById("fb"); fb.className="fb"; fb.innerHTML="";
+  const body = document.getElementById("qBody");
+  lastAnswerAt = Date.now();
+
+  if(q.kind==="listen"){
+    body.innerHTML = `<div style="text-align:center">
+      <div class="qtext">🎧 聽一聽，選出你聽到的詞語</div>
+      <button class="speak-btn" onclick="speak('${q.target.w}')">🔊 播放詞語</button>
+      <div id="opts" class="options">${q.options.map(o=>optBtn(o.w)).join("")}</div></div>`;
+    setTimeout(()=>{ if(session && session.qs[session.idx]===q) speak(q.target.w); }, 350);
+  } else if(q.kind==="def2word"){
+    body.innerHTML = `<div class="qtext">📖 這個解釋對應哪個詞語？</div>
+      <div style="background:var(--blue-soft);border-radius:12px;padding:14px;margin-bottom:14px;font-size:1.1em">「${q.target.def}」</div>
+      <div id="opts" class="options">${q.options.map(o=>optBtn(o.w)).join("")}</div>`;
+  } else if(q.kind==="word2def"){
+    body.innerHTML = `<div class="qtext">📘 「${q.target.w}」的意思是什麼？</div>
+      <div style="background:var(--blue-soft);border-radius:12px;padding:14px;margin-bottom:14px;font-size:1.15em">${q.target.w}<span style="color:#8a8a8a;font-size:.78em">（${q.target.p}）</span></div>
+      <div id="opts" class="options">${q.options.map(o=>optBtn(o)).join("")}</div>`;
+  } else {
+    const [a,b,c] = q.fill.s;
+    body.innerHTML = `<div class="qtext">✏️ 選詞填空</div>
+      <div style="font-size:1.12em">${a}<span class="blank-in">＿＿＿</span>${b||""}${c||""}</div>
+      <div id="opts" class="options" style="margin-top:16px">${q.options.map(o=>optBtn(o)).join("")}</div>`;
+  }
+}
+function optBtn(label){ return `<button class="opt" onclick="answer(this)">${label}</button>`; }
+
+/* ================= 作答（答後自動下一題） ================= */
+function answer(btn){
+  if(btn.disabled) return;
+  const q = session.qs[session.idx];
+  const val = btn.textContent;
+  const correctVal = q.kind==="word2def" ? q.target.def : (q.target ? q.target.w : q.fill.ans);
+  const ok = (val===correctVal);
+  document.querySelectorAll("#opts .opt").forEach(b=>b.disabled=true);
+  const fb = document.getElementById("fb");
+  if(ok){
+    session.right++;
+    btn.classList.add("correct");
+    fb.className="fb ok";
+    fb.innerHTML = pickPraise() + `<div class="countdown">即將進入下一題…</div>`;
+  } else {
+    btn.classList.add("wrong");
+    document.querySelectorAll("#opts .opt").forEach(b=>{ if(b.textContent===correctVal) b.classList.add("correct"); });
+    fb.className="fb bad";
+    const pinyin = q.target ? `（${q.target.p}）` : "";
+    fb.innerHTML = `再想一想！正確答案是「${correctVal}」${pinyin}<span class="why">${explain(q)}</span>
+      <div class="countdown">即將進入下一題…</div>`;
+  }
+  session.results.push({q, ok});
+  const delay = ok ? 1100 : 2200;
+  autoTimer = setTimeout(()=>{ nextQ(); }, delay);
+}
+
+function pickPraise(){
+  const arr=["✓ 太好了，完全正確！","✓ 好棒！這個詞語你掌握了！","✓ 恭喜你，答對了！","✓ 非常棒，繼續加油！"];
+  return arr[Math.floor(Math.random()*arr.length)];
+}
+function explain(q){
+  if(q.kind==="listen") return `剛才讀的是「${q.target.w}」${q.target.p?`（${q.target.p}）`:""}。`;
+  if(q.kind==="def2word") return `「${q.target.def}」就是「${q.target.w}」。`;
+  if(q.kind==="word2def") return `「${q.target.w}」：${q.target.def}。`;
+  return `這句應該用「${q.fill.ans}」。`;
+}
+
+function nextQ(){
+  clearTimeout(autoTimer);
+  session.idx++;
+  if(session.idx>=session.qs.length){ finishQuiz(); return; }
+  showQ();
+}
+
+function finishQuiz(){
+  const {g, l, right, qs} = session;
+  score[key(g.id,l.id)] = {right:right, total:qs.length};
+  saveResult(g.id, l.id, right, qs.length);
+  const pass = right>=8;
+  document.getElementById("qBody").innerHTML = `<div class="done-box">
+      <div class="big">${right===qs.length?"🏆":(pass?"🎉":"💪")}</div>
+      <h3>${right} / ${qs.length} 題正確</h3>
+      <div class="stars">${"⭐".repeat(Math.max(1,Math.round(right/qs.length*3)))}${"☆".repeat(3-Math.max(1,Math.round(right/qs.length*3)))}</div>
+      <p style="margin:10px 0 16px">${pass? "太棒了，這個關卡通過了！可以挑戰下一個關卡。":"答對 8 題以上才能通過，再試一次吧！"}</p>
+      <button class="btn" onclick="retry()">🔁 再挑戰一次</button>
+      <button class="btn green" onclick="exitQuiz()" style="margin-left:8px">返回關卡列表</button>
+    </div>`;
+  document.getElementById("fb").className="fb";
+  document.getElementById("barFill").style.width="100%";
+  document.getElementById("qCount").textContent="完成！";
+  renderHome();
+}
+function retry(){ startQuiz(session.gid, session.lvId); }
+function exitQuiz(){
+  clearTimeout(autoTimer);
+  if(session && session.idx < session.qs.length && session.idx>0){
+    // 中途離開：記錄已完成部分（未達 10 題不計入通關，但記錄作答數）
+    const {g,l,qs} = session;
+    if(!score[key(g.id,l.id)]) score[key(g.id,l.id)] = {right:0,total:0};
+  }
+  document.getElementById("quiz").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+  renderHome();
+}
+
+/* ================= 語音 ================= */
+function speak(text){
+  try{
+    if(!window.speechSynthesis) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    const vs = speechSynthesis.getVoices();
+    const v = vs.find(v=>/zh[-_]?(HK|TW|Hant)/i.test(v.lang)) || vs.find(v=>/^zh/i.test(v.lang));
+    if(v) u.voice=v;
+    u.lang = v? v.lang : "zh-HK";
+    u.rate = 0.85;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* ================= 老師後台 ================= */
+let tTab = "all";
+function openTeacher(){
+  const pwd = prompt("請輸入老師密碼（預設：teacher）");
+  if(pwd===null) return;
+  if(pwd.trim()!=="teacher"){ alert("密碼不正確。"); return; }
+  document.getElementById("gate").classList.add("hidden");
+  document.getElementById("app").classList.add("hidden");
+  document.getElementById("teacher").classList.remove("hidden");
+  renderTeacher();
+}
+function closeTeacher(){
+  document.getElementById("teacher").classList.add("hidden");
+  if(student){ document.getElementById("app").classList.remove("hidden"); renderHome(); }
+  else document.getElementById("gate").classList.remove("hidden");
+}
+function latestByStudent(db){
+  // 每位學生 × 每個關卡 取最新一次成績
+  const map = {};
+  db.records.forEach(r=>{
+    const k = r.cls+"|"+r.name+"|"+r.gid+"|"+r.lid;
+    if(!map[k] || r.ts>map[k].ts) map[k]=r;
+  });
+  return Object.values(map);
+}
+function renderTeacher(){
+  const db = loadAll();
+  const rows = latestByStudent(db);
+  // 統計卡
+  const names = new Set(db.records.map(r=>r.cls+"|"+r.name));
+  const passCnt = rows.filter(r=>r.pass).length;
+  const avg = rows.length? Math.round(rows.reduce((a,b)=>a+b.right/b.total*100,0)/rows.length):0;
+  document.getElementById("sumGrid").innerHTML = `
+    <div class="sum-card"><b>${names.size}</b><span>作答學生數</span></div>
+    <div class="sum-card"><b>${db.records.length}</b><span>作答總次數</span></div>
+    <div class="sum-card"><b>${passCnt}</b><span>通關項目數</span></div>
+    <div class="sum-card"><b>${avg}%</b><span>平均正確率</span></div>`;
+
+  // 分頁
+  const tabs = [{id:"all",label:"全部"}, ...GROUPS.map(g=>({id:g.id,label:g.name}))];
+  document.getElementById("tabs").innerHTML = tabs.map(t=>
+    `<button class="${tTab===t.id?"on":""}" onclick="tTab='${t.id}';renderTeacher()">${t.label}</button>`).join("");
+
+  // 表格：以 學生 × 關卡 呈現
+  const students = {};
+  rows.forEach(r=>{ const k=r.cls+"|"+r.name; students[k]=students[k]||{name:r.name,cls:r.cls,items:{}}; students[k].items[r.gid+"-"+r.lid]=r; });
+  const list = Object.values(students)
+    .filter(s => tTab==="all" ? true : Object.keys(s.items).some(k=>k.startsWith(tTab+"-")))
+    .sort((a,b)=> a.cls.localeCompare(b.cls) || a.name.localeCompare(b.name));
+
+  const gsel = tTab==="all" ? GROUPS : GROUPS.filter(g=>g.id===tTab);
+  let head = `<tr><th>班別</th><th>姓名</th>`;
+  gsel.forEach(g=> LV.forEach(l=> head += `<th>${g.name.slice(0,4)}<br>${l.id==="green"?"🟢":l.id==="yellow"?"🟡":"🔴"}</th>`));
+  head += `<th>總分</th></tr>`;
+
+  let body = "";
+  list.forEach(s=>{
+    let total=0, got=0, cells="";
+    gsel.forEach(g=> LV.forEach(l=>{
+      const r = s.items[g.id+"-"+l.id];
+      if(r){ total+=r.total; got+=r.right; cells += `<td class="num"><span class="pill ${r.pass?"p":"f"}">${r.right}/${r.total}</span></td>`; }
+      else cells += `<td class="num"><span class="pill n">—</span></td>`;
+    }));
+    const pct = total? Math.round(got/total*100):0;
+    body += `<tr><td>${s.cls}</td><td><b>${s.name}</b></td>${cells}<td class="num">${got}/${total}（${pct}%）</td></tr>`;
+  });
+  if(!list.length) body = `<tr><td colspan="99" style="text-align:center;color:var(--muted);padding:24px">還沒有學生成績記錄</td></tr>`;
+
+  document.getElementById("tableWrap").innerHTML = `<table><thead>${head}</thead><tbody>${body}</tbody></table>`;
+}
+
+function clearAll(){
+  if(!confirm("確定清空所有學生成績記錄？此動作無法復原，建議先匯出 CSV。")) return;
+  if(!confirm("再次確認：清空後所有班級的成績都會消失。")) return;
+  saveAll({records:[]});
+  renderTeacher();
+}
+function exportCSV(){
+  const db = loadAll();
+  const nameOf = (gid,lid)=>{
+    const g = GROUPS.find(x=>x.id===gid), l = LV.find(x=>x.id===lid);
+    return (g?g.name:gid)+"-"+(l?l.id:lid);
+  };
+  let csv = "時間,班別,姓名,部分,關卡,答對,總題數,正確率,是否通關\n";
+  db.records.forEach(r=>{
+    csv += [new Date(r.ts).toLocaleString("zh-HK"), r.cls, r.name, nameOf(r.gid,"").split("-")[0],
+            nameOf("",r.lid).split("-")[1], r.right, r.total,
+            Math.round(r.right/r.total*100)+"%", r.pass?"通關":"未通關"].join(",")+"\n";
+  });
+  const blob = new Blob(["\ufeff"+csv], {type:"text/csv;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "詞語練習成績_"+new Date().toISOString().slice(0,10)+".csv";
+  a.click();
+}
+
+/* ================= 啟動 ================= */
+(function init(){
+  // 每次進入都要輸入姓名與班別，避免上一位學生的身份被沿用
+  try{ localStorage.removeItem("childhood_words_current"); }catch(e){}
+  document.getElementById("gate").classList.remove("hidden");
+  document.getElementById("app").classList.add("hidden");
+})();
+function switchStudent(){
+  if(!confirm("確定要切換學生嗎？目前這位同學的分數已經記錄，不會丟失。")) return;
+  try{ localStorage.removeItem("childhood_words_current"); }catch(e){}
+  student = null;
+  document.getElementById("nameInput").value = "";
+  document.getElementById("hdrUser").textContent = "";
+  document.getElementById("quiz").classList.add("hidden");
+  document.getElementById("teacher").classList.add("hidden");
+  document.getElementById("app").classList.add("hidden");
+  document.getElementById("gate").classList.remove("hidden");
+  document.getElementById("nameInput").focus();
+}
+</script>
+</body>
+</html>
