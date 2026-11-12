@@ -1,1 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>成語與詞語練習站｜MYP Ph4 (HSK4)</title>
+<style>
+  :root{
+    --blue:#4f8ef7; --lightblue:#eaf2ff; --dark:#2c3e50;
+    --green:#2ecc71; --red:#e74c3c; --yellow:#f39c12;
+  }
+  *{box-sizing:border-box; margin:0; padding:0; font-family:"PingFang TC","Microsoft JhengHei",sans-serif;}
+  body{background:linear-gradient(180deg,#eef4ff 0%,#f7fbff 100%); color:var(--dark); min-height:100vh;}
+  header{background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.08); padding:18px 24px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
+  .logo{background:var(--blue); color:#fff; border-radius:10px; padding:8px 14px; font-size:22px; font-weight:bold;}
+  header h1{font-size:20px;}
+  header p{font-size:13px; color:#7f8c8d; width:100%;}
+  nav{display:flex; gap:10px; justify-content:center; padding:16px; flex-wrap:wrap;}
+  nav button{padding:10px 22px; border:none; border-radius:24px; background:#fff; color:var(--dark); font-size:16px; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.1); transition:.2s;}
+  nav button.active{background:var(--blue); color:#fff; transform:translateY(-2px);}
+  main{max-width:860px; margin:0 auto; padding:0 16px 60px;}
+  .panel{display:none; animation:fade .3s;}
+  .panel.active{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(8px);} to{opacity:1;}}
+  .card{background:#fff; border-radius:14px; padding:18px 20px; margin-bottom:16px; box-shadow:0 2px 10px rgba(0,0,0,.07);}
+  .card h3{font-size:17px; margin-bottom:10px; color:var(--blue);}
+  .btn{padding:8px 18px; border:none; border-radius:8px; cursor:pointer; font-size:15px; background:var(--blue); color:#fff; transition:.2s;}
+  .btn:hover{filter:brightness(1.1);}
+  .btn.ghost{background:#fff; color:var(--blue); border:1.5px solid var(--blue);}
+  .feedback{margin-top:8px; font-size:15px; font-weight:bold; min-height:22px;}
+  .ok{color:var(--green);} .bad{color:var(--red);}
+  /* 配對 */
+  .match-wrap{display:flex; gap:20px; justify-content:space-between;}
+  .match-col{flex:1; display:flex; flex-direction:column; gap:10px;}
+  .match-item{padding:12px 14px; border-radius:10px; background:var(--lightblue); cursor:pointer; border:2px solid transparent; font-size:16px; text-align:center; transition:.15s; user-select:none;}
+  .match-item.sel{border-color:var(--blue); background:#d6e6ff; transform:scale(1.03);}
+  .match-item.done-ok{background:#d9f7e6; border-color:var(--green); color:#1e7e4a; pointer-events:none;}
+  .match-item.done-bad{background:#ffe3e0; border-color:var(--red);}
+  /* 填空 */
+  .blank-input{border:none; border-bottom:2px solid var(--blue); background:#fdfdfd; padding:4px 8px; font-size:16px; width:130px; text-align:center; outline:none; margin:0 4px;}
+  .blank-input.ok{border-color:var(--green); color:var(--green);}
+  .blank-input.bad{border-color:var(--red); color:var(--red);}
+  /* 排序 */
+  .sent-tokens{display:flex; flex-wrap:wrap; gap:8px; margin:12px 0;}
+  .token{padding:8px 14px; background:var(--lightblue); border-radius:8px; cursor:pointer; font-size:17px; border:2px solid transparent; user-select:none;}
+  .token.sel{border-color:var(--blue); background:#d6e6ff;}
+  .answer-area{min-height:52px; border:2px dashed var(--blue); border-radius:10px; padding:8px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; background:#fbfdff;}
+  /* 造句 */
+  .vocab-cloud{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:6px;}
+  .vocab-cloud span{background:#fff4e3; color:#b06a00; padding:6px 12px; border-radius:16px; font-size:15px; cursor:pointer; border:1.5px solid #f5c66b;}
+  .vocab-cloud span:hover{background:#ffe9c2;}
+  .sentence-input{width:100%; padding:12px; font-size:16px; border:1.5px solid #ccd7ee; border-radius:10px; outline:none; resize:vertical; min-height:70px;}
+  .sentence-input:focus{border-color:var(--blue);}
+  .score-bar{font-size:14px; color:#7f8c8d; margin:10px 0;}
+  .big-score{font-size:40px; font-weight:bold; color:var(--blue);}
+  .hint{font-size:13px; color:#95a5a6;}
+  .used-word{background:#d9f7e6 !important; border-color:var(--green) !important; color:#1e7e4a !important;}
+  @media(max-width:600px){ .match-wrap{flex-direction:column;} }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">成語</div>
+  <h1>成語與詞語練習站 <span style="font-size:13px;color:#888;">MYP Phase 4 ｜ HSK4 水平</span></h1>
+  <div style="text-align:center;margin-top:6px">
+    <a href="../index.html" style="display:inline-block;background:rgba(255,255,255,.25);color:#fff;
+      text-decoration:none;border-radius:99px;padding:3px 14px;font-size:13px">🔗 前往「《童年》詞語練習網站」</a>
+  </div>
+  <p>本單元成語：一表人才、其貌不揚、另眼相看、才貌雙全、樂善好施、一毛不拔、助人為樂、先人後己　＋　本課生字詞</p>
+</header>
 
+<nav>
+  <button class="active" onclick="show('match',this)">🔗 成語配對</button>
+  <button onclick="show('blank',this)">✏️ 句子填空</button>
+  <button onclick="show('order',this)">🧩 句子排序</button>
+  <button onclick="show('make',this)">📝 造句練習</button>
+</nav>
+
+<main>
+
+<!-- ========== 1. 配對 ========== -->
+<section id="match" class="panel active">
+  <div class="card">
+    <h3>任務一：成語與意思配對</h3>
+    <p class="hint">先點左邊的成語，再點右邊的意思。配對正確會變綠色。</p>
+    <div class="match-wrap">
+      <div class="match-col" id="matchLeft"></div>
+      <div class="match-col" id="matchRight"></div>
+    </div>
+    <div class="feedback" id="matchFb"></div>
+    <div style="margin-top:12px;">
+      <button class="btn ghost" onclick="initMatch()">🔄 重新開始</button>
+      <span class="score-bar" id="matchScore"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 2. 填空 ========== -->
+<section id="blank" class="panel">
+  <div class="card">
+    <h3>任務二：成語句子填空</h3>
+    <p class="hint">在橫線上填入正確的成語，離開輸入框（點別處）自動批改。</p>
+    <div id="blankList"></div>
+    <button class="btn ghost" onclick="initBlank()">🔄 重新開始</button>
+    <span class="score-bar" id="blankScore"></span>
+  </div>
+</section>
+
+<!-- ========== 3. 排序 ========== -->
+<section id="order" class="panel">
+  <div class="card">
+    <h3>任務三：句子排序</h3>
+    <p class="hint">按正確語序點擊詞語，組成完整的句子。全部排完自動批改。</p>
+    <div id="orderArea"></div>
+  </div>
+</section>
+
+<!-- ========== 4. 造句 ========== -->
+<section id="make" class="panel">
+  <div class="card">
+    <h3>任務四：用本單元詞語造句</h3>
+    <p class="hint">下方是本單元學過的詞語，點一下可以放進句子裡。寫完句子按「檢查我的句子」，系統會判斷句子里有沒有正確使用本單元詞語。</p>
+    <div class="vocab-cloud" id="vocabCloud"></div>
+
+    <div class="card" style="background:#fdfefe;">
+      <h3 id="makeTitle">題目</h3>
+      <p id="makePrompt" style="margin-bottom:8px;"></p>
+      <p class="hint" style="margin-bottom:6px;">例句：<span id="makeExample"></span></p>
+      <textarea class="sentence-input" id="makeInput" placeholder="請在這裡寫你的句子……"></textarea>
+      <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
+        <button class="btn" onclick="checkSentence()">✅ 檢查我的句子</button>
+        <button class="btn ghost" onclick="nextMake()">➡️ 下一題</button>
+        <span class="score-bar" id="makeScore"></span>
+      </div>
+      <div class="feedback" id="makeFb"></div>
+      <div class="card" style="margin-top:12px; background:#f3f8ff; padding:14px; font-size:14px;">
+        <b style="color:#4f8ef7;">✅ 甚麼樣的句子才算對？（四項都要做到）</b><br>
+        1. <b>用到</b>至少一個本單元詞語（用兩三個更好；寫錯字會有提示）<br>
+        2. <b>不是貼標籤</b>：不能只寫「他是一個○○的人。」——要用這個詞語說明他<b>做了甚麼</b>（只要有一個詞語說清楚就算通過）<br>
+        3. <b>有細節</b>：寫出甚麼時候、為誰、怎樣做、有甚麼結果（用「每次／常常／因為／連…都」等）<br>
+        4. <b>句子完整</b>，結尾有標點；一句話不要堆超過三個詞語<br>
+        <span class="hint">對比：<br>
+        ✗「他是一個樂善好施的人。」（只是貼標籤）<br>
+        ✓「爺爺<b>樂善好施</b>，每逢過年都會買米送給村裡的老人。」（有時間、有具體行動）</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+/* ==================== 資料 ==================== */
+const idioms = [
+  {w:"一表人才", m:"形容人相貌英俊、儀表堂堂。"},
+  {w:"其貌不揚", m:"形容人長得不好看。"},
+  {w:"另眼相看", m:"用不同的眼光看待，指特別重視或佩服某人。"},
+  {w:"才貌雙全", m:"才能和容貌都很出色，兩樣都具備。"},
+  {w:"樂善好施", m:"喜歡做善事，樂意幫助別人、捐助財物。"},
+  {w:"一毛不拔", m:"形容人非常吝嗇、自私，連一根毛都不肯拔。"},
+  {w:"助人為樂", m:"把幫助別人當作快樂。"},
+  {w:"先人後己", m:"先為別人著想，然後才想到自己。"}
+];
+
+const blanks = [
+  {s:"我的哥哥不但|一表人才|，學習成績也十分優秀。"},
+  {s:"雖然他|其貌不揚|，但是心地卻很善良。"},
+  {s:"自從他幫助了那個孩子以後，大家都對他|另眼相看|。"},
+  {s:"她不但會跳舞、會畫畫，人又漂亮，真是|才貌雙全|。"},
+  {s:"奶奶是個|樂善好施|的人，幫助了很多失學的孩子。"},
+  {s:"他很有錢，可是對朋友|一毛不拔|，大家都不喜歡他。"},
+  {s:"我們要養成|助人為樂|的好習慣。"},
+  {s:"老師常常教我們做事要|先人後己|，多為別人著想。"}
+];
+
+const orders = [
+  {tokens:["雖然","他","其貌不揚","，","但是","心地","卻","很","善良","。"],
+   ok:["雖然","他","其貌不揚","，","但是","心地","卻","很","善良","。"]},
+  {tokens:["奶奶","是個","樂善好施","的人","，","幫助","了","很多","失學","的孩子","。"],
+   ok:["奶奶","是個","樂善好施","的人","，","幫助","了","很多","失學","的孩子","。"]},
+  {tokens:["醜小鴨","變成","白天鵝","以後","，","小動物們","都","對它","另眼相看","。"],
+   ok:["醜小鴨","變成","白天鵝","以後","，","小動物們","都","對它","另眼相看","。"]},
+  {tokens:["我的","哥哥","不但","一表人才","，","學習成績","也","十分","優秀","。"],
+   ok:["我的","哥哥","不但","一表人才","，","學習成績","也","十分","優秀","。"]}
+];
+
+const vocabWords = ["盛開","玩耍","允許","嚇壞","豎起","禁止","告示牌","裹著","激動","發脾氣","疑惑",
+"責罵","難為情","自私","盡情","無比","欺負","羨慕","暖烘烘","出世","毛茸茸","裂開","鑽","啄",
+"嚇唬","流浪","孤零零","煩惱","高貴","優雅","結冰","驚奇","嘲笑","周圍","大吃一驚","驚嘆"];
+
+const makeTasks = [
+  {prompt:"用「樂善好施」造句。想一想：什麼樣的人是樂善好施的人？他做了什麼？",
+   example:"奶奶是個樂善好施的人，她常常把自己的零用錢捐出來，幫助了很多失學的孩子。",
+   words:["樂善好施"], type:"idiom"},
+  {prompt:"用「另眼相看」造句。想一想：誰因為什麼事情讓別人對他另眼相看？",
+   example:"醜小鴨變成白天鵝以後，小動物們都對它另眼相看。",
+   words:["另眼相看"], type:"idiom"},
+  {prompt:"用「助人為樂」和「先人後己」中的一個造句。",
+   example:"哥哥助人為樂，每次看到同學有困難，他都會主動幫忙。",
+   words:["助人為樂","先人後己"], type:"idiom"},
+  {prompt:"用本課詞語「欺負」或「嘲笑」造句。想一想：我們應不應該欺負、嘲笑別人？",
+   example:"我們不能因為自己長得高，就欺負一年級的小同學。",
+   words:["欺負","嘲笑"], type:"word"},
+  {prompt:"用「羨慕」造句。想一想：你羨慕誰？為什麼？",
+   example:"我很羨慕表姐，因為她不但鋼琴彈得好，學習成績也十分優秀。",
+   words:["羨慕"], type:"word"},
+  {prompt:"用「難為情」造句。想一想：什麼時候人會覺得難為情？",
+   example:"上課遲到的時候，全班同學都看著我，我覺得很難為情，臉都紅了。",
+   words:["難為情"], type:"word"},
+  {prompt:"用「大吃一驚」或「驚奇」造句。想一想：看到什麼東西你會大吃一驚？",
+   example:"打開門，我大吃一驚：房間裡掛滿了彩帶和氣球，原來是家人為我準備了生日派對！",
+   words:["大吃一驚","驚奇"], type:"word"},
+  {prompt:"自由造句挑戰：從上面的詞語雲中任選一個（或兩個）詞語，寫一個完整、通順的句子。",
+   example:"星期天，我們在公園裡盡情地玩耍，直到太陽下山才捨不得地回家。",
+   words:null, type:"any"}
+];
+
+/* ==================== 導航 ==================== */
+function show(id, btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+/* ==================== 1. 配對 ==================== */
+let mSelL=null, mSelR=null, mDone=0;
+function shuffle(a){return a.slice().sort(()=>Math.random()-.5);}
+function initMatch(){
+  mSelL=null; mSelR=null; mDone=0;
+  document.getElementById('matchFb').textContent="";
+  updateMatchScore();
+  const L=document.getElementById('matchLeft'), R=document.getElementById('matchRight');
+  L.innerHTML=""; R.innerHTML="";
+  shuffle(idioms).forEach((d,i)=>{
+    const el=document.createElement('div'); el.className='match-item'; el.textContent=d.w; el.dataset.w=d.w;
+    el.onclick=()=>pickL(el); L.appendChild(el);
+  });
+  shuffle(idioms).forEach(d=>{
+    const el=document.createElement('div'); el.className='match-item'; el.textContent=d.m; el.dataset.w=d.w;
+    el.onclick=()=>pickR(el); R.appendChild(el);
+  });
+}
+function pickL(el){
+  if(el.classList.contains('done-ok'))return;
+  document.querySelectorAll('#matchLeft .match-item').forEach(x=>x.classList.remove('sel'));
+  el.classList.add('sel'); mSelL=el; tryMatch();
+}
+function pickR(el){
+  if(el.classList.contains('done-ok'))return;
+  document.querySelectorAll('#matchRight .match-item').forEach(x=>x.classList.remove('sel'));
+  el.classList.add('sel'); mSelR=el; tryMatch();
+}
+function tryMatch(){
+  const fb=document.getElementById('matchFb');
+  if(!mSelL||!mSelR)return;
+  if(mSelL.dataset.w===mSelR.dataset.w){
+    mSelL.className='match-item done-ok'; mSelR.className='match-item done-ok';
+    mSelL.textContent+="　✓"; fb.className='feedback ok'; fb.textContent="太棒了！配對正確！🎉";
+    mDone++; updateMatchScore();
+    if(mDone===idioms.length){fb.textContent="全部配對完成，你太厲害了！🏆";}
+  }else{
+    fb.className='feedback bad'; fb.textContent="再想一想，這兩個不是一對哦。試試 again！";
+    mSelR.classList.add('done-bad'); mSelL.classList.add('done-bad');
+    setTimeout(()=>{mSelL&&mSelL.classList.remove('done-bad','sel'); mSelR&&mSelR.classList.remove('done-bad','sel'); mSelL=null;mSelR=null;},500);
+    mSelL=null; mSelR=null;
+  }
+}
+function updateMatchScore(){document.getElementById('matchScore').textContent=`已完成 ${mDone} / ${idioms.length}`;}
+
+/* ==================== 2. 填空 ==================== */
+function initBlank(){
+  const box=document.getElementById('blankList'); box.innerHTML="";
+  document.getElementById('blankScore').textContent="";
+  shuffle(blanks).forEach(b=>{
+    const parts=b.s.split('|');
+    const div=document.createElement('div'); div.className='card';
+    let html='<p style="font-size:17px; line-height:2;">';
+    parts.forEach((p,i)=>{
+      if(i%2===1) html+=`<input class="blank-input" data-a="${p}" maxlength="4" placeholder="成語">`;
+      else html+=p;
+    });
+    html+='</p><div class="feedback"></div>';
+    div.innerHTML=html;
+    const inp=div.querySelector('input'), fb=div.querySelector('.feedback');
+    inp.addEventListener('input',()=>{inp.classList.remove('ok','bad'); fb.textContent="";});
+    inp.addEventListener('blur',()=>{
+      if(!inp.value.trim())return;
+      if(inp.value.trim()===inp.dataset.a){
+        inp.classList.add('ok'); inp.readOnly=true;
+        fb.className='feedback ok'; fb.textContent="✓ 正確！";
+        updateBlankScore();
+      }else{
+        inp.classList.add('bad');
+        fb.className='feedback bad'; fb.textContent="✗ 不對哦，再想想。（提示：四個字的成語）";
+      }
+    });
+    box.appendChild(div);
+  });
+}
+function updateBlankScore(){
+  const okN=document.querySelectorAll('.blank-input.ok').length;
+  document.getElementById('blankScore').textContent=`已完成 ${okN} / ${blanks.length}`;
+}
+
+/* ==================== 3. 排序 ==================== */
+let oIdx=0, oSel=null, oAnswer=[];
+function initOrder(){oIdx=0; renderOrder();}
+function renderOrder(){
+  const area=document.getElementById('orderArea');
+  if(oIdx>=orders.length){
+    area.innerHTML=`<div class="feedback ok">🎉 全部排序完成，你已經掌握了這些句型！</div>
+    <button class="btn ghost" onclick="initOrder()">🔄 再玩一次</button>`;
+    return;
+  }
+  oSel=null; oAnswer=[];
+  const d=orders[oIdx];
+  area.innerHTML=`
+    <p class="score-bar">第 ${oIdx+1} / ${orders.length} 句</p>
+    <p class="hint">把下面的詞語排成一句通順的話：</p>
+    <div class="sent-tokens" id="oTokens"></div>
+    <div class="answer-area" id="oAnswer"></div>
+    <div style="margin-top:10px; display:flex; gap:10px;">
+      <button class="btn ghost" onclick="oUndo()">↩️ 撤銷一個詞</button>
+      <button class="btn ghost" onclick="oSkip()">⏭️ 換一句</button>
+    </div>
+    <div class="feedback" id="oFb"></div>`;
+  const tk=document.getElementById('oTokens');
+  shuffle(d.tokens).forEach(t=>{
+    const el=document.createElement('span'); el.className='token'; el.textContent=t;
+    el.onclick=()=>{
+      if(el.disabled)return;
+      oAnswer.push(t); el.disabled=true; el.style.opacity=.35; el.style.pointerEvents='none';
+      drawAnswer();
+      checkOrder();
+    };
+    tk.appendChild(el);
+  });
+  drawAnswer();
+}
+function drawAnswer(){
+  document.getElementById('oAnswer').innerHTML =
+    oAnswer.length? oAnswer.map(t=>`<span class="token" style="background:#d6e6ff;">${t}</span>`).join('')
+    : '<span class="hint">（點擊上面的詞語放到這裡）</span>';
+}
+function oUndo(){
+  if(!oAnswer.length)return;
+  const last=oAnswer.pop();
+  [...document.querySelectorAll('#oTokens .token')].forEach(el=>{
+    if(el.textContent===last && el.disabled){el.disabled=false; el.style.opacity=1; el.style.pointerEvents='auto';}
+  });
+  drawAnswer();
+}
+function oSkip(){oIdx++; renderOrder();}
+function checkOrder(){
+  const d=orders[oIdx], fb=document.getElementById('oFb');
+  if(oAnswer.length<d.tokens.length){
+    fb.className='feedback'; fb.textContent=`還需要 ${d.tokens.length-oAnswer.length} 個詞……`;
+    return;
+  }
+  if(oAnswer.join('')===d.ok.join('')){
+    fb.className='feedback ok'; fb.textContent="✓ 完全正確！句子排對了！🎉";
+    setTimeout(()=>{oIdx++; renderOrder();},1400);
+  }else{
+    fb.className='feedback bad'; fb.textContent="✗ 順序不對哦，再讀一讀，調整一下。";
+  }
+}
+
+/* ==================== 4. 造句 ==================== */
+let mkIdx=0, mkStats={done:0, ok:0};
+function initMake(){
+  const cloud=document.getElementById('vocabCloud');
+  cloud.innerHTML="";
+  vocabWords.forEach(w=>{
+    const s=document.createElement('span'); s.textContent=w;
+    s.onclick=()=>{
+      const inp=document.getElementById('makeInput');
+      inp.value += (inp.value && !/[，。！？、\s]$/.test(inp.value)?'':'') + w;
+      s.classList.add('used-word');
+      setTimeout(()=>s.classList.remove('used-word'),800);
+      inp.focus();
+    };
+    cloud.appendChild(s);
+  });
+  renderMake();
+}
+function renderMake(){
+  const t=makeTasks[mkIdx];
+  document.getElementById('makeTitle').textContent=`題目 ${mkIdx+1} / ${makeTasks.length}`;
+  document.getElementById('makePrompt').textContent=t.prompt;
+  document.getElementById('makeExample').textContent=t.example;
+  document.getElementById('makeInput').value="";
+  document.getElementById('makeFb').textContent=""; document.getElementById('makeFb').className='feedback';
+  updateMakeScore();
+}
+function nextMake(){ mkIdx=(mkIdx+1)%makeTasks.length; renderMake(); }
+function updateMakeScore(){document.getElementById('makeScore').textContent=`已完成 ${mkStats.done} 句，通過 ${mkStats.ok} 句`;}
+
+function checkSentence(){
+  const t=makeTasks[mkIdx], fb=document.getElementById('makeFb');
+  const text=document.getElementById('makeInput').value.trim();
+  fb.className='feedback';
+  if(!text){ fb.className='feedback bad'; fb.textContent="請先寫一個句子。"; return; }
+  mkStats.done++; updateMakeScore();
+
+  const problems=[];
+  // 1. 句末標點
+  if(!/[。！？!?]$/.test(text)) problems.push("句子結尾要加標點（。！？）");
+  // 2. 先掃描全句用了哪些本單元詞語
+  const unitAll = [...idioms.map(x=>x.w), ...vocabWords];
+  const usedWords = unitAll.filter(w=>text.includes(w));
+
+  // 3. 找出「合格的詞語」：有細節說明的才算數（可以同時用多個）
+  const validWords = usedWords.filter(w=>checkDetail(text, w));
+  const candidates = t.words ? t.words.filter(w=>text.includes(w)) : usedWords;
+  const validForTask = candidates.filter(w=>validWords.includes(w));
+
+  // 4. 依題型判斷是否達標（★ 只要有一個詞語「用對且說清楚」就算達標，用多個更好）
+  if(t.type==='any'){
+    if(usedWords.length===0){
+      problems.push("句子裡沒有本單元的詞語。請從上面的詞語雲／成語中<b>至少選用一個</b>（如：盛開、羨慕、大吃一驚、樂善好施……）");
+    }else if(validWords.length===0){
+      problems.push(`你用了「<b>${usedWords.join('、')}</b>」，但句子還沒有說清楚它的意思。<b>要加上細節</b>（什麼時候、為誰、怎樣做、結果如何），讓人從事情中理解這個詞語。<br><span class='hint'>例如：<b>爺爺</b>樂善好施，<b>每逢過年都會買米送給村裡的老人</b>。</span>`);
+    }
+  }else if(!candidates.length){
+    // 指定詞語一個都沒寫
+    const near = t.words.find(w=>nearMiss(text,w));
+    if(near) problems.push(`你是不是想寫「<b>${near}</b>」？請檢查用字有沒有寫錯。`);
+    else problems.push(`句子裡沒有用到指定的${t.type==='idiom'?'成語':'詞語'}：<b>${t.words.join(' / ')}</b>`);
+  }else if(validForTask.length===0){
+    problems.push(`你用了「<b>${candidates.join('、')}</b>」，但句子只是「A 是一個……的人」這樣的貼標籤句，還沒有細節。<b>要用它去說明他做了什麼事／怎麼做</b>，讓人從事情中理解這個詞語。<br><span class='hint'>例如：<b>爺爺</b>樂善好施，<b>每逢過年都會買米送給村裡的老人</b>。</span>`);
+  }
+
+  // 5. 堆砌詞語（太多詞語反而說不清）
+  if(usedWords.length>3){
+    problems.push("一句話裡堆了太多詞語，句子會不清楚。請<b>集中用一兩個詞語</b>把意思說明白。");
+  }
+
+  if(problems.length===0){
+    mkStats.ok++; updateMakeScore();
+    fb.className='feedback ok';
+    const okList = (t.type==='any' ? validWords : validForTask).join('、');
+    fb.innerHTML=`✓ 太好了！句子完整，用到了「<b>${okList}</b>」，還有細節說明，讓人從事情中理解這個詞語。👍`;
+  }else{
+    fb.className='feedback bad';
+    fb.innerHTML="還需要修改：<br>• "+problems.join("<br>• ");
+    fb.innerHTML+="<br><span class='hint'>修改後再按「檢查我的句子」。</span>";
+  }
+}
+
+/* 錯字偵測：把目標詞語逐字替換成常見同音字，看學生是否寫成了錯字版本 */
+function nearMiss(text, word){
+  if(text.includes(word)) return false;
+  const chars = word.split('');
+  const homophones = {
+    '羨':'羡線先仙','慕':'幕墓募暮','猶':'由油','豫':'預遇','驕':'嬌','傲':'敖遨','慷':'康',
+    '慨':'概','慷':'康','盡':'儘','情':'晴','嘲':'潮','笑':'肖','欺':'期','負':'付',
+    '煩':'繁','惱':'腦','優':'憂','雅':'牙','驚':'京','奇':'其','嘆':'歎','膽':'擔',
+    '赤':'斥','裸':'顆','溫':'溫','暖':'緩','烘':'哄','茸':'蓉','裂':'烈','鑽':'賺',
+    '啄':'琢','唬':'虎','流':'留','浪':'朗','孤':'狐','零':'靈','惱':'瑙','允':'充',
+    '許':'許','禁':'經','止':'只','裹':'果','著':'着','豎':'樹','盛':'成','開':'開',
+    '玩':'玩','耍':'要','允':'允','嚇':'下','壞':'環','激':'機','動':'凍','疑':'宜',
+    '惑':'或','責':'則','罵':'馬','難':'雖','為':'爲','私':'思','比':'比','欺':'欺',
+    '出':'初','世':'市','毛':'矛','高':'高','貴':'桂','結':'結','冰':'兵','周':'周',
+    '圍':'違','大':'太','吃':'喫','一':'一','表':'表','人':'人','才':'材','貌':'冒',
+    '揚':'楊','另':'令','眼':'限','看':'坎','雙':'雙','全':'全','善':'善','好':'號',
+    '施':'師','毛':'毛','不':'布','拔':'拔','助':'助','人':'人','先':'仙','後':'后',
+    '己':'已','樂':'藥','百':'白','發':'發','脾':'皮','氣':'器','容':'融','易':'意'
+  };
+  for(let i=0;i<chars.length;i++){
+    const alt = homophones[chars[i]];
+    if(!alt) continue;
+    for(const c of alt){
+      if(c===chars[i]) continue;
+      const wrong = chars.slice(0,i).join('')+c+chars.slice(i+1).join('');
+      if(text.includes(wrong)) return true;
+    }
+  }
+  return false;
+}
+
+/* 細節檢查：分辨「貼標籤句」和「真正用詞語說明事情」 */
+function checkDetail(text, word){
+  const clean = text.replace(/[。！？!?]+$/,'').trim();
+  /* ① 按標點切成若干分句 */
+  const clauses = clean.split(/[，,；;。！？!?]/).map(c=>c.trim()).filter(Boolean);
+  const wordClause = clauses.find(c=>c.includes(word));
+  if(!wordClause) return false;
+
+  const otherClauses = clauses.filter(c=>c!==wordClause);
+
+  /* ①-b 連結性檢查：含詞語的分句必須與後面分句有邏輯關聯（逗號／因果／遞進），
+        否則視為「兩句不相干的話拼在一起」 */
+  const idxWordClause = clauses.indexOf(wordClause);
+  const laterClauses = clauses.slice(idxWordClause+1);
+  const hasConnector = /^[那但可所因於結然並而還就才也則]/.test((laterClauses[0]||'')) ||
+                       /(所以|因此|於是|結果|但是|可是|不過|而且|並且|反而|才|就)/.test(clean);
+
+  /* ② 去掉主語／判斷詞後剩下的「實質內容」 */
+  const strip = c => c.split(word).join('').trim()
+        .replace(/^[他她我你它我們你們他們她們它們這那]/g,'')
+        .replace(/^(真是|就是|是|像|作為|屬於|當|有|也是)/,'')
+        .replace(/[個的了吧呢啊嘛]/g,'')
+        .trim();
+
+  // 去掉詞語後，若只剩「主語＋是＋數量詞＋的＋人/東西」這種框架，就是貼標籤
+  const shellFrame = wordClause.split(word).join('')
+        .replace(/^[他她我你它我們你們他們她們它們這那]/g,'')
+        .replace(/^(真是|就是|是|像|作為|屬於|當|就)/,'')
+        .replace(/一個|一位|一名|個|種/g,'')
+        .replace(/[的了吧呢啊嘛]/g,'')
+        .trim();
+  const wordShellBody = shellFrame;
+  /* ③ 含詞語的分句只是「（他）是…的人／東西」，去掉詞語後只剩「人／東西」→ 貼標籤 */
+  const wordClauseIsShell = /^(人|人物|孩子|學生|同學|老師|朋友|傢伙|東西)?$/.test(wordShellBody);
+
+  /* ④ 細節分句：不含詞語、去掉虛詞後仍有 ≥3 字實質內容 */
+  const detailClauses = otherClauses.filter(c=>{
+    const t = c.replace(/^[他她我你它這那]/,'').replace(/[的了著地個吧呢啊]/g,'').trim();
+    return t.length >= 3;
+  });
+
+  /* ⑤ 詞語前後有動作／情境描寫標記 */
+  const actionMarker = /(每逢|每當|每次|常常|經常|總是|總會|從來|一向|不但|因為|所以|為了|看到|遇見|把|讓|幫|給|捐|借|送|做|說|帶|領|照顧|分享|主動|結果|最後|直到|才|都|連[^，]{0,8}都|並且|而且|順便|之後|接著|甚至|可是|但是|卻|還)/.test(clean);
+  const modifierInWordClause = /(很|非常|十分|特別|太|真|都|也|已|正在|不斷|不停|開始|總|一直|立刻|馬上|忽然|突然|漸漸|開滿|滿)/.test(wordClause);
+
+  /* 結論：
+     ★ 含詞語的分句是「貼標籤」（他是一個○○的人）→ 必須靠「其他分句」補細節才算通過。
+     ★ 含詞語的分句本身已有動作／情況（爺爺樂善好施）→ 有其他分句即算通過。
+     ★ 只有一句、沒有任何細節 → 不通過。 */
+  if(detailClauses.length >= 1){
+    // 貼標籤句（他是一個○○的人）→ 其他分句必須真的在解釋這個詞語，不能湊一句無關的話
+    if(wordClauseIsShell){
+      // 沒有邏輯連接詞又把兩句硬拼在一起 → 不算細節（如：他是一個○○的人。他還是說我是對的。）
+      if(!hasConnector) return false;
+      const relevant = detailClauses.some(c=>
+        /(幫助|幫忙|捐|送|借|給|照顧|分享|主動|因為|所以|每逢|每次|常常|經常|總是|看到|遇見|讓|把|做|說|帶|領|反而|可是|但是|卻|連|因此|結果)/.test(c)
+      );
+      return relevant;
+    }
+    return true;   // 詞語分句本身已說明情況，另有細節分句 → 通過
+  }
+  return false;   // 沒有其他分句可補細節 → 一律不通過（避免「我們應該先人後己。」被判對）
+}
+
+/* ==================== 啟動 ==================== */
+initMatch(); initBlank(); initOrder(); initMake();
+</script>
+</body>
+</html>
